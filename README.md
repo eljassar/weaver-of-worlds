@@ -1,8 +1,8 @@
 # Weaver of Worlds — MAVYR
 
-Public project overview for **MAVYR**, a premium first-person living-world RPG set in the Maramis universe.
+Public project hub for **MAVYR**, a premium first-person living-world RPG set in the Maramis universe.
 
-The site is intentionally a concise public brief—not a wiki, production vault, or technical reference.
+The current public output is the **Phase 8 final presentation candidate**: a frozen Obsidian Violet overview with a directed cinematic rhythm, authored Living Worldcraft sequence, restrained feedback, and responsive accessibility treatment.
 
 ## Preview locally
 
@@ -16,13 +16,14 @@ Then open `http://localhost:8000`.
 
 ## Structure
 
-- `index.html` — semantic single-page overview
-- `assets/css/site.css` — responsive visual system
-- `assets/js/site.js` — navigation and small progressive enhancements
-- `assets/images/` — identity and future approved project media
+- `index.html` — semantic single-page MAVYR project overview
+- `assets/css/site.css` — tokens, shell, Hero, editorial composition, causal sequence, motion, and responsive treatment
+- `assets/js/site.js` — minimal progressive reveal, causal propagation, and navigation state
+- `assets/images/favicon.svg` — minimal identity mark
+- `docs/web/` — web design contract, phase plan, and current status
 
 ## Publishing
 
-GitHub Pages is configured to publish the repository root from `main`. Changes merged to `main` are deployed automatically; no build workflow is required.
+GitHub Pages publishes the repository root from `main`; no build workflow is required.
 
 Live URL: <https://eljassar.github.io/weaver-of-worlds/>

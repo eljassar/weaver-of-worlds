@@ -1,58 +1,96 @@
-const header = document.querySelector("[data-header]");
-const navToggle = document.querySelector("[data-nav-toggle]");
-const navigation = document.querySelector("[data-navigation]");
-const navLinks = [...document.querySelectorAll(".site-nav a")];
+const root = document.documentElement;
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const motionEnabled = !reducedMotion.matches;
+const revealElements = [...document.querySelectorAll("[data-reveal]")];
+const causalSequence = document.querySelector("[data-causal-sequence]");
 
-const setHeaderState = () => {
-  header?.classList.toggle("is-scrolled", window.scrollY > 24);
+const revealAll = () => {
+  revealElements.forEach((element) => element.classList.add("is-revealed"));
 };
 
-const closeNavigation = () => {
-  if (!navToggle || !navigation) return;
-  navToggle.setAttribute("aria-expanded", "false");
-  navigation.classList.remove("is-open");
-  document.body.style.overflow = "";
-};
+if (motionEnabled) {
+  root.classList.add("motion-enabled");
 
-navToggle?.addEventListener("click", () => {
-  const willOpen = navToggle.getAttribute("aria-expanded") !== "true";
-  navToggle.setAttribute("aria-expanded", String(willOpen));
-  navigation?.classList.toggle("is-open", willOpen);
-  document.body.style.overflow = willOpen ? "hidden" : "";
-});
-
-navLinks.forEach((link) => link.addEventListener("click", closeNavigation));
-
-window.addEventListener("resize", () => {
-  if (window.innerWidth > 720) closeNavigation();
-});
-
-window.addEventListener("scroll", setHeaderState, { passive: true });
-setHeaderState();
-
-const observedSections = navLinks
-  .map((link) => document.querySelector(link.getAttribute("href")))
-  .filter(Boolean);
-
-if ("IntersectionObserver" in window) {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
-      if (!visible) return;
-      navLinks.forEach((link) => {
-        const isCurrent = link.getAttribute("href") === `#${visible.target.id}`;
-        if (isCurrent) link.setAttribute("aria-current", "true");
-        else link.removeAttribute("aria-current");
-      });
-    },
-    { rootMargin: "-20% 0px -65%", threshold: [0, 0.2, 0.5] },
-  );
-
-  observedSections.forEach((section) => observer.observe(section));
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => root.classList.add("is-loaded"));
+  });
+} else {
+  root.classList.add("is-loaded");
+  revealAll();
 }
 
-const year = document.querySelector("[data-year]");
-if (year) year.textContent = new Date().getFullYear();
+if (motionEnabled && "IntersectionObserver" in window) {
+  const revealObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        entry.target.classList.add("is-revealed");
+        observer.unobserve(entry.target);
+      });
+    },
+    { rootMargin: "0px 0px -14%", threshold: 0.08 },
+  );
+
+  revealElements.forEach((element) => revealObserver.observe(element));
+
+  if (causalSequence) {
+    causalSequence.classList.add("is-motion-ready");
+
+    const sequenceObserver = new IntersectionObserver(
+      ([entry], observer) => {
+        if (!entry.isIntersecting) return;
+
+        causalSequence.classList.add("is-active");
+        observer.unobserve(entry.target);
+      },
+      { rootMargin: "0px 0px -18%", threshold: 0.08 },
+    );
+
+    sequenceObserver.observe(causalSequence);
+  }
+} else {
+  revealAll();
+}
+
+const siteHeader = document.querySelector(".site-header");
+const navigationLinks = [...document.querySelectorAll(".site-nav__link[href^='#']")];
+const navigationTargets = navigationLinks
+  .map((link) => ({ link, target: document.querySelector(link.hash) }))
+  .filter(({ target }) => target);
+
+const updateNavigation = () => {
+  siteHeader?.classList.toggle("is-scrolled", window.scrollY > 12);
+
+  const readingLine = window.scrollY + window.innerHeight * 0.42;
+  let activeItem = navigationTargets[0];
+
+  navigationTargets.forEach((item) => {
+    if (item.target.offsetTop <= readingLine) activeItem = item;
+  });
+
+  navigationTargets.forEach(({ link }) => {
+    const isActive = link === activeItem?.link;
+    link.classList.toggle("site-nav__link--active", isActive);
+
+    if (isActive) {
+      link.setAttribute("aria-current", "location");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+};
+
+let navigationFrame;
+const scheduleNavigationUpdate = () => {
+  if (navigationFrame) return;
+
+  navigationFrame = requestAnimationFrame(() => {
+    updateNavigation();
+    navigationFrame = undefined;
+  });
+};
+
+updateNavigation();
+window.addEventListener("scroll", scheduleNavigationUpdate, { passive: true });
+window.addEventListener("resize", scheduleNavigationUpdate);
