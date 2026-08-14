@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 512 256"
+     role="img"
+     aria-labelledby="title desc"
+     color="#000000">
+  <title id="title">MAVYR — Causal Weave icon</title>
+  <desc id="desc">Two geometric paths weave once; one passes over the other and exits subtly changed.</desc>
+
+  <g fill="none"
+     stroke="currentColor"
+     stroke-width="20"
+     stroke-linecap="butt"
+     stroke-linejoin="round">
+
+    <!-- UNDER PATH — split at the weave so the crossing stays legible
+         on a transparent background. -->
+    <path d="
+      M 62 72
+      H 154
+      C 171 72, 181 77, 195 87
+      L 236 116
+    "/>
+
+    <path d="
+      M 279 142
+      L 319 170
+      C 333 180, 344 184, 361 184
+      H 450
+    "/>
+
+    <!-- OVER PATH — continuous causal path -->
+    <path d="
+      M 62 184
+      H 158
+      C 174 184, 185 179, 198 170
+      L 316 87
+      C 330 77, 341 72, 357 72
+      H 438
+    "/>
+  </g>
+</svg>
